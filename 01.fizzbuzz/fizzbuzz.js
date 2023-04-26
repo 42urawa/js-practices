@@ -1,19 +1,13 @@
 [...Array(20).keys()]
   .map((i) => ++i)
   .forEach((currentValue) => {
-    switch (0) {
-      case currentValue % (3 * 5):
-        console.log("FizzBuzz");
-        break;
-
-      case currentValue % 3:
-        console.log("Fizz");
-        break;
-      case currentValue % 5:
-        console.log("Buzz");
-        break;
-      default:
-        console.log(currentValue);
-        break;
+    if (currentValue % (3 * 5) === 0) {
+      console.log("FizzBuzz");
+    } else if (currentValue % 3 === 0) {
+      console.log("Fizz");
+    } else if (currentValue % 5 === 0) {
+      console.log("Buzz");
+    } else {
+      console.log(currentValue);
     }
   });
