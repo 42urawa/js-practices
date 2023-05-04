@@ -1,17 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  <div>非同期処理(JavaScript)</div>
-  <script>
-    fetch('https://bootcamp.fjord.jp/')
-    .then((response) => console.log(response.status))
-    // .then((response) => console.log(response.html()))
-  </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>非同期処理(JavaScript)</div>
+    <script>
+      async function fetchHtml() {
+        try {
+          const response = await fetch("https://bootcamp.fjord.jp");
+          if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status}`);
+          }
+          const text = await response.text();
+          console.log(text);
+        } catch (error) {
+          console.error(`Could not get products: ${error}`);
+        }
+      }
+      fetchHtml();
+    </script>
+  </body>
 </html>
