@@ -10,40 +10,68 @@ if (argv["l"]) {
     }
     console.log(`${row.content.split("\n")[0]}`);
   });
+  db.close();
 } else if (argv["r"]) {
-  let memos = ["apple", "grape", "watermelon", "cherry", "orange"];
   db.all("SELECT content FROM memos", (err, row) => {
     if (err) {
       console.error(err.message);
     }
-    memos = row.map((content) => content["content"].split("\n")[0]);
-  });
-  const prompt = new Select({
-    name: "memo",
-    message: "Choose a note you want to see:",
-    choices: memos,
-  });
+    row.map(
+      (contentObject) =>
+        (contentObject["name"] = contentObject["content"].split("\n")[0])
+    );
 
-  prompt
-    .run()
-    .then((answer) => console.log("Answer:", answer))
-    .catch(console.error);
+    const prompt = new Select({
+      name: "value",
+      message: "Choose a note you want to see:",
+      choices: row,
+    });
+
+    prompt
+      .run()
+      .then((answer) => {
+        const selectedContent = row.find((choice) => choice.name === answer);
+        console.log(selectedContent.content);
+      })
+      .catch(console.error);
+    db.close();
+  });
+  // } else if (true) {
 } else if (argv["d"]) {
-  console.log("Choose a note you want to delete:");
-} else {
   db.all("SELECT content FROM memos", (err, row) => {
     if (err) {
       console.error(err.message);
     }
-    console.log(row.map((content) => content["content"]));
+    row.map(
+      (contentObject) =>
+        (contentObject["name"] = contentObject["content"].split("\n")[0])
+    );
+
+    const prompt = new Select({
+      name: "value",
+      message: "Choose a note you want to delete:",
+      choices: row,
+    });
+
+    prompt
+      .run()
+      .then((answer) => {
+        const selectedContent = row.find((choice) => choice.name === answer);
+        db.run(
+          "delete from memos where content = (?)",
+          selectedContent.content,
+          (err) => {
+            if (err) {
+              console.error(err.message);
+            }
+            db.close();
+          }
+        );
+      })
+      .catch(console.error);
   });
+} else {
+  db.run("insert into memos values (?)", "夜やること\nねる");
+  // db.run("delete from memos where content = (?)", "夜やること\nねる");
+  db.close();
 }
-
-// const insertStmt = db.prepare("INSERT INTO memos (content) VALUES (?)");
-//
-// const multilineMessage = "Hello,\nThis is a multiline message.";
-// insertStmt.run(multilineMessage);
-//
-// insertStmt.finalize();
-
-db.close();
