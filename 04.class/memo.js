@@ -1,4 +1,4 @@
-var argv = require("minimist")(process.argv.slice(2));
+const argv = require("minimist")(process.argv.slice(2));
 const { Select } = require("enquirer");
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("./memo.sqlite");
@@ -71,7 +71,13 @@ if (argv["l"]) {
       .catch(console.error);
   });
 } else {
-  db.run("insert into memos values (?)", "夜やること\nねる");
-  // db.run("delete from memos where content = (?)", "夜やること\nねる");
-  db.close();
+  process.stdin.resume();
+  process.stdin.setEncoding("utf8");
+
+  // stdinがなんか読み込んだ時に呼ばれる.
+  process.stdin.on("data", function (chunk) {
+    //実際のchunkは予期せぬ位置で細切れに入ってくる.
+    db.run("insert into memos values (?)", chunk);
+    db.close();
+  });
 }
