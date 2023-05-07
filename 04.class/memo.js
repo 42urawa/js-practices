@@ -73,10 +73,7 @@ if (argv["l"]) {
 } else {
   process.stdin.resume();
   process.stdin.setEncoding("utf8");
-
-  // stdinがなんか読み込んだ時に呼ばれる.
   process.stdin.on("data", function (chunk) {
-    //実際のchunkは予期せぬ位置で細切れに入ってくる.
     db.run("insert into memos values (?)", chunk);
     db.close();
   });
