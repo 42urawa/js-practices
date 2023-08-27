@@ -1,31 +1,47 @@
 import sqlite3 from "sqlite3";
 const db = new sqlite3.Database(":memory:");
 
+const runAsync = (sql, callback, ...params) => {
+  db.run(sql, ...params, callback);
+};
+
+const allAsync = (sql, callback, ...params) => {
+  db.all(sql, ...params, callback);
+};
+
 new Promise((resolve) => {
-  db.run(
+  runAsync(
     "create table if not exists books(id integer primary key autoincrement, title text not null unique)",
     () => resolve(db)
   );
 })
   .then((db) => {
     return new Promise((resolve) => {
-      db.run("insert into books(title) values(?)", "mario", function () {
-        resolve(db);
-        console.log(`id: ${this.lastID} が自動発番されました`);
-      });
+      runAsync(
+        "insert into books(title) values(?)",
+        function () {
+          resolve(db);
+          console.log(`id: ${this.lastID} が自動発番されました`);
+        },
+        "mario"
+      );
     });
   })
   .then((db) => {
     return new Promise((resolve) => {
-      db.run("insert into books(title) values(?)", "luige", function () {
-        resolve(db);
-        console.log(`id: ${this.lastID} が自動発番されました`);
-      });
+      runAsync(
+        "insert into books(title) values(?)",
+        function () {
+          resolve(db);
+          console.log(`id: ${this.lastID} が自動発番されました`);
+        },
+        "luige"
+      );
     });
   })
   .then((db) => {
     return new Promise((resolve) => {
-      db.all("select * from books", (err, rows) => {
+      allAsync("select * from books", (err, rows) => {
         rows.forEach((row) => {
           console.log(`${row.id} ${row.title}`);
         });
@@ -35,7 +51,7 @@ new Promise((resolve) => {
   })
   .then((db) => {
     return new Promise((resolve) => {
-      db.run("drop table if exists books", () => resolve(db));
+      runAsync("drop table if exists books", () => resolve(db));
     });
   })
   .then((db) => {
