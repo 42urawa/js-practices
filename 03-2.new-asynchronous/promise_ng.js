@@ -1,18 +1,16 @@
-const sqlite3 = require("sqlite3");
+import sqlite3 from "sqlite3";
+const db = new sqlite3.Database(":memory:");
 
-Promise.resolve(new sqlite3.Database(":memory:"))
-  .then((db) => {
-    return new Promise((resolve) => {
-      db.run(
-        "create table if not exists books(id integer primary key autoincrement, title text not null unique)",
-        () => resolve(db)
-      );
-    });
-  })
+new Promise((resolve) => {
+  db.run(
+    "create table if not exists books(id integer primary key autoincrement, title text not null unique)",
+    () => resolve(db)
+  );
+})
   .then((db) => {
     return new Promise((resolve) => {
       db.run("insert into books(title) values(?, ?)", "mario", 20, (err) => {
-        if (err) console.error("マリオのデータを挿入できませんでした");
+        if (err) console.error(err);
         resolve(db);
       });
     });
@@ -26,7 +24,7 @@ Promise.resolve(new sqlite3.Database(":memory:"))
     return new Promise((resolve) => {
       db.all("select * from games", (err, rows) => {
         if (err) {
-          console.error("データの取得に失敗しました");
+          console.error(err);
         } else {
           rows.forEach((row) => {
             console.log(`${row.id} ${row.title}`);

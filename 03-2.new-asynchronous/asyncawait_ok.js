@@ -1,8 +1,7 @@
 import sqlite3 from "sqlite3";
+const db = new sqlite3.Database(":memory:");
 
 (async () => {
-  const db = new sqlite3.Database(":memory:");
-
   await new Promise((resolve) => {
     db.run(
       "create table if not exists books(id integer primary key autoincrement, title text not null unique)",

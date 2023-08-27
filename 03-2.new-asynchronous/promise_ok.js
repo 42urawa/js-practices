@@ -1,14 +1,12 @@
 import sqlite3 from "sqlite3";
+const db = new sqlite3.Database(":memory:");
 
-Promise.resolve(new sqlite3.Database(":memory:"))
-  .then((db) => {
-    return new Promise((resolve) => {
-      db.run(
-        "create table if not exists books(id integer primary key autoincrement, title text not null unique)",
-        () => resolve(db)
-      );
-    });
-  })
+new Promise((resolve) => {
+  db.run(
+    "create table if not exists books(id integer primary key autoincrement, title text not null unique)",
+    () => resolve(db)
+  );
+})
   .then((db) => {
     return new Promise((resolve) => {
       db.run("insert into books(title) values(?)", "mario", function () {
