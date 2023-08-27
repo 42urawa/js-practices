@@ -1,4 +1,4 @@
-const sqlite3 = require("sqlite3");
+import sqlite3 from "sqlite3";
 
 Promise.resolve(new sqlite3.Database(":memory:"))
   .then((db) => {
@@ -11,12 +11,18 @@ Promise.resolve(new sqlite3.Database(":memory:"))
   })
   .then((db) => {
     return new Promise((resolve) => {
-      db.run("insert into books(title) values(?)", "mario", () => resolve(db));
+      db.run("insert into books(title) values(?)", "mario", function () {
+        resolve(db);
+        console.log(`id: ${this.lastID} が自動発番されました`);
+      });
     });
   })
   .then((db) => {
     return new Promise((resolve) => {
-      db.run("insert into books(title) values(?)", "luige", () => resolve(db));
+      db.run("insert into books(title) values(?)", "luige", function () {
+        resolve(db);
+        console.log(`id: ${this.lastID} が自動発番されました`);
+      });
     });
   })
   .then((db) => {
