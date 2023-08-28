@@ -1,44 +1,47 @@
 import sqlite3 from "sqlite3";
 const db = new sqlite3.Database(":memory:");
 
-new Promise((resolve) => {
-  db.run(
-    "create table if not exists books(id integer primary key autoincrement, title text not null unique)",
-    () => resolve(db)
-  );
-})
-  .then((db) => {
-    return new Promise((resolve) => {
-      db.run("insert into books(title) values(?, ?)", "mario", 20, (err) => {
-        if (err) console.error(err);
-        resolve(db);
-      });
+const runAsync = (sql, ...params) => {
+  return new Promise((resolve, reject) => {
+    db.run(sql, ...params, function (err) {
+      if (err) console.error(err);
+      if (sql.startsWith("insert"))
+        console.log(`id: ${this.lastID} が自動発番されました`);
+      resolve(db);
     });
+  });
+};
+
+const allAsync = (sql, ...params) => {
+  return new Promise((resolve, reject) => {
+    db.all(sql, ...params, (err, rows) => {
+      if (err) {
+        console.error(err);
+      } else {
+        rows.forEach((row) => {
+          console.log(`${row.id} ${row.title}`);
+        });
+      }
+      resolve(db);
+    });
+  });
+};
+
+runAsync(
+  "create table if not exists books(id integer primary key autoincrement, title text not null unique)"
+)
+  .then(() => {
+    return runAsync("insert into books(title) values(?)", "mario", 20);
+  })
+  .then(() => {
+    return runAsync("insert into books(title) values(?)", "luige");
+  })
+  .then(() => {
+    return allAsync("select * from games");
+  })
+  .then(() => {
+    return runAsync("drop table if exists books");
   })
   .then((db) => {
-    return new Promise((resolve) => {
-      db.run("insert into books(title) values(?)", "luige", () => resolve(db));
-    });
-  })
-  .then((db) => {
-    return new Promise((resolve) => {
-      db.all("select * from games", (err, rows) => {
-        if (err) {
-          console.error(err);
-        } else {
-          rows.forEach((row) => {
-            console.log(`${row.id} ${row.title}`);
-          });
-        }
-        resolve(db);
-      });
-    });
-  })
-  .then((db) => {
-    return new Promise((resolve) => {
-      db.run("drop table if exists books", () => resolve(db));
-    });
-  })
-  .then((db) => {
-    db.close();
+    return db.close();
   });

@@ -1,27 +1,20 @@
 import sqlite3 from "sqlite3";
 const db = new sqlite3.Database(":memory:");
 
-(async () => {
-  await new Promise((resolve) => {
-    db.run(
-      "create table if not exists books(id integer primary key autoincrement, title text not null unique)",
-      () => resolve(db)
-    );
-  });
-
-  await new Promise((resolve) => {
-    db.run("insert into books(title) values(?, ?)", "mario", 20, (err) => {
+const runAsync = (sql, ...params) => {
+  return new Promise((resolve, reject) => {
+    db.run(sql, ...params, function (err) {
       if (err) console.error(err);
+      if (sql.startsWith("insert"))
+        console.log(`id: ${this.lastID} が自動発番されました`);
       resolve(db);
     });
   });
+};
 
-  await new Promise((resolve) => {
-    db.run("insert into books(title) values(?)", "luige", () => resolve(db));
-  });
-
-  await new Promise((resolve) => {
-    db.all("select * from games", (err, rows) => {
+const allAsync = (sql, ...params) => {
+  return new Promise((resolve, reject) => {
+    db.all(sql, ...params, (err, rows) => {
       if (err) {
         console.error(err);
       } else {
@@ -32,10 +25,15 @@ const db = new sqlite3.Database(":memory:");
       resolve(db);
     });
   });
+};
 
-  await new Promise((resolve) => {
-    db.run("drop table if exists books", () => resolve(db));
-  });
-
+(async () => {
+  await runAsync(
+    "create table if not exists books(id integer primary key autoincrement, title text not null unique)"
+  );
+  await runAsync("insert into books(title) values(?)", "mario", 20);
+  await runAsync("insert into books(title) values(?)", "luige");
+  await allAsync("select * from games");
+  await runAsync("drop table if exists books");
   db.close();
 })();
