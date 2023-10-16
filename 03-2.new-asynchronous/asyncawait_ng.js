@@ -4,10 +4,13 @@ const db = new sqlite3.Database(":memory:");
 const runAsync = (sql, ...params) => {
   return new Promise((resolve, reject) => {
     db.run(sql, ...params, function (err) {
-      if (err) console.error(err);
-      if (sql.startsWith("insert"))
-        console.log(`id: ${this.lastID} が自動発番されました`);
-      resolve(db);
+      if (err) {
+        reject(err);
+      } else {
+        if (sql.startsWith("insert"))
+          console.log(`id: ${this.lastID} が自動発番されました`);
+        resolve(db);
+      }
     });
   });
 };
@@ -16,24 +19,32 @@ const allAsync = (sql, ...params) => {
   return new Promise((resolve, reject) => {
     db.all(sql, ...params, (err, rows) => {
       if (err) {
-        console.error(err);
+        reject(err);
       } else {
         rows.forEach((row) => {
           console.log(`${row.id} ${row.title}`);
         });
+        resolve(db);
       }
-      resolve(db);
     });
   });
 };
 
 (async () => {
-  await runAsync(
-    "create table if not exists books(id integer primary key autoincrement, title text not null unique)"
-  );
-  await runAsync("insert into books(title) values(?)", "mario", 20);
-  await runAsync("insert into books(title) values(?)", "luige");
-  await allAsync("select * from games");
+  try {
+    await runAsync(
+      "create table if not exists books(id integer primary key autoincrement, title text not null unique)"
+    );
+    await runAsync("insert into books(title) values(?)", "mario", 20);
+  } catch (err) {
+    console.error(err.message);
+  }
+  try {
+    await runAsync("insert into books(title) values(?)", "luige");
+    await allAsync("select * from games");
+  } catch (err) {
+    console.error(err.message);
+  }
   await runAsync("drop table if exists books");
   db.close();
 })();

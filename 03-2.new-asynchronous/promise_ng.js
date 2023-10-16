@@ -4,10 +4,13 @@ const db = new sqlite3.Database(":memory:");
 const runAsync = (sql, ...params) => {
   return new Promise((resolve, reject) => {
     db.run(sql, ...params, function (err) {
-      if (err) console.error(err);
-      if (sql.startsWith("insert"))
-        console.log(`id: ${this.lastID} が自動発番されました`);
-      resolve(db);
+      if (err) {
+        reject(err);
+      } else {
+        if (sql.startsWith("insert"))
+          console.log(`id: ${this.lastID} が自動発番されました`);
+        resolve(db);
+      }
     });
   });
 };
@@ -16,13 +19,13 @@ const allAsync = (sql, ...params) => {
   return new Promise((resolve, reject) => {
     db.all(sql, ...params, (err, rows) => {
       if (err) {
-        console.error(err);
+        reject(err);
       } else {
         rows.forEach((row) => {
           console.log(`${row.id} ${row.title}`);
         });
+        resolve(db);
       }
-      resolve(db);
     });
   });
 };
@@ -33,14 +36,23 @@ runAsync(
   .then(() => {
     return runAsync("insert into books(title) values(?)", "mario", 20);
   })
+  .catch((err) => {
+    console.error(err.message);
+  })
   .then(() => {
     return runAsync("insert into books(title) values(?)", "luige");
   })
   .then(() => {
     return allAsync("select * from games");
   })
+  .catch((err) => {
+    console.error(err.message);
+  })
   .then(() => {
     return runAsync("drop table if exists books");
+  })
+  .catch((err) => {
+    console.error(err);
   })
   .then((db) => {
     return db.close();
