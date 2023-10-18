@@ -1,50 +1,46 @@
+import { runAsync, allAsync, closeAsync } from "./function_ng.js";
 import sqlite3 from "sqlite3";
+
 const db = new sqlite3.Database(":memory:");
-
-const runAsync = (sql, ...params) => {
-  return new Promise((resolve, reject) => {
-    db.run(sql, ...params, function (err) {
-      if (err) {
-        reject(err);
-      } else {
-        if (sql.startsWith("insert"))
-          console.log(`id: ${this.lastID} が自動発番されました`);
-        resolve(db);
-      }
-    });
-  });
-};
-
-const allAsync = (sql, ...params) => {
-  return new Promise((resolve, reject) => {
-    db.all(sql, ...params, (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        rows.forEach((row) => {
-          console.log(`${row.id} ${row.title}`);
-        });
-        resolve(db);
-      }
-    });
-  });
-};
 
 (async () => {
   try {
     await runAsync(
-      "create table if not exists books(id integer primary key autoincrement, title text not null unique)"
+      db,
+      "CREATE table IF NOT EXISTS books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)"
     );
-    await runAsync("insert into books(title) values(?)", "mario", 20);
+    const marioId = await runAsync(
+      db,
+      "INSERT INTO books(title) VALUES(?)",
+      "mario",
+      20
+    );
+    console.log(`id: ${marioId} が自動発番されました`);
   } catch (err) {
-    console.error(err.message);
+    if (err instanceof Error) {
+      console.error(err.message);
+    } else {
+      throw err;
+    }
   }
   try {
-    await runAsync("insert into books(title) values(?)", "luige");
-    await allAsync("select * from games");
+    const luigeId = await runAsync(
+      db,
+      "INSERT INTO books(title) VALUES(?)",
+      "luige"
+    );
+    console.log(`id: ${luigeId} が自動発番されました`);
+    const rows = await allAsync(db, "SELECT * FROM games");
+    rows.forEach((row) => {
+      console.log(`${row.id} ${row.title}`);
+    });
   } catch (err) {
-    console.error(err.message);
+    if (err instanceof Error) {
+      console.error(err.message);
+    } else {
+      throw err;
+    }
   }
-  await runAsync("drop table if exists books");
-  db.close();
+  await runAsync(db, "DROP TABLE IF EXISTS books");
+  await closeAsync(db);
 })();
