@@ -3,7 +3,7 @@ import sqlite3 from "sqlite3";
 const db = new sqlite3.Database(":memory:");
 
 db.run(
-  "CREATE table IF NOT EXISTS books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
+  "CREATE TABLE IF NOT EXISTS books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
   () => {
     db.run("INSERT INTO books(title) VALUES(?)", "mario", function () {
       console.log(`id: ${this.lastID} が自動発番されました`);

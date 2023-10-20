@@ -1,11 +1,11 @@
-import { runAsync, allAsync, closeAsync } from "./function_ng.js";
 import sqlite3 from "sqlite3";
+import { runAsync, allAsync, closeAsync } from "./function.js";
 
 const db = new sqlite3.Database(":memory:");
 
 runAsync(
   db,
-  "CREATE table IF NOT EXISTS books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)"
+  "CREATE TABLE IF NOT EXISTS books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)"
 )
   .then(() => runAsync(db, "INSERT INTO books(title) VALUES(?)", "mario", 20))
   .then((id) => {
@@ -21,8 +21,8 @@ runAsync(
   .then(() => runAsync(db, "INSERT INTO books(title) VALUES(?)", "luige"))
   .then((id) => {
     console.log(`id: ${id} が自動発番されました`);
+    return allAsync(db, "SELECT * FROM games");
   })
-  .then(() => allAsync(db, "SELECT * FROM games"))
   .then((rows) => {
     rows.forEach((row) => {
       console.log(`${row.id} ${row.title}`);
