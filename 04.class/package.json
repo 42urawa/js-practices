@@ -9,8 +9,11 @@
     "prettier": "^2.7.1"
   },
   "dependencies": {
+    "commander": "^11.1.0",
     "enquirer": "^2.3.6",
     "minimist": "^1.2.8",
-    "sqlite3": "^5.1.6"
-  }
+    "sqlite3": "^5.1.6",
+    "yargs": "^17.7.2"
+  },
+  "type": "module"
 }
