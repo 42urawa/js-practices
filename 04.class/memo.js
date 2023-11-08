@@ -161,15 +161,19 @@ class DBAccessor {
 }
 
 class EnquirerAccessor {
+  #choices;
+  #message;
+
   constructor(choices, message) {
-    (this.choices = choices), (this.message = message);
+    this.#choices = choices;
+    this.#message = message;
   }
 
   async executor() {
     const prompt = new Select({
       name: "value",
-      message: this.message,
-      choices: this.choices,
+      message: this.#message,
+      choices: this.#choices,
     });
 
     return await prompt.run();
