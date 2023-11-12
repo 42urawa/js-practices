@@ -5,15 +5,12 @@ const { Select } = enquirer;
 const db = new sqlite3.Database("./memo.sqlite");
 const option = process.argv.slice(2)[0];
 
-class OptionController {
-  #option;
-
+class Memo {
   constructor(option) {
-    this.#option = option;
+    this.option = option;
   }
 
-  async execute() {
-    let executor;
+  async init() {
     let rows;
 
     try {
@@ -22,103 +19,77 @@ class OptionController {
       console.error(err.message);
     }
 
-    if (this.#option === "-l") {
-      executor = new ListExecutor(rows);
-    } else if (this.#option === "-r") {
-      executor = new ReadExecutor(rows);
-    } else if (this.#option === "-d") {
-      executor = new DeleteExecutor(rows);
+    this.rows = rows;
+  }
+
+  headers() {
+    return this.rows.map((row) => row.content.split("\n")[0]);
+  }
+
+  questionMessage() {
+    if (this.option === "-r") {
+      return "Choose a memo you want to see:";
+    } else if (this.option === "-d") {
+      return "Choose a memo you want to delete:";
     } else {
-      executor = new CreateExecutor();
+      return "";
     }
-
-    await executor.execute();
-  }
-}
-
-class ListExecutor {
-  #rows;
-
-  constructor(rows) {
-    this.#rows = rows;
   }
 
   async execute() {
-    const headers = this.#rows.map((row) => row.content.split("\n")[0]);
-    headers.forEach((choice) => console.log(choice));
+    if (this.option === "-l") {
+      this.headers().forEach((header) => console.log(header));
+      await DBAccessor.closeAsync(db);
+    } else if (this.option === "-r") {
+      const prompt = new Select({
+        name: "value",
+        message: this.questionMessage(),
+        choices: this.headers(),
+      });
+      const answer = await prompt.run();
 
-    await DBAccessor.closeAsync(db);
-  }
-}
-
-class ReadExecutor {
-  #rows;
-  #message;
-
-  constructor(rows) {
-    this.#rows = rows;
-    this.#message = "Choose a memo you want to see:";
-  }
-
-  async execute() {
-    const choices = this.#rows.map((row) => row.content.split("\n")[0]);
-    const enquirerAccessor = new EnquirerAccessor(choices, this.#message);
-    const answer = await enquirerAccessor.executor();
-
-    const selectedContent = this.#rows.find(
-      (row) => row.content.split("\n")[0] === answer
-    );
-    console.log(selectedContent.content);
-
-    await DBAccessor.closeAsync(db);
-  }
-}
-
-class DeleteExecutor {
-  #rows;
-  #message;
-
-  constructor(rows) {
-    this.#rows = rows;
-    this.#message = "Choose a memo you want to delete:";
-  }
-
-  async execute() {
-    const choices = this.#rows.map((row) => row.content.split("\n")[0]);
-    const enquirerAccessor = new EnquirerAccessor(choices, this.#message);
-    const answer = await enquirerAccessor.executor();
-
-    const selectedContent = this.#rows.find(
-      (row) => row.content.split("\n")[0] === answer
-    );
-
-    try {
-      await DBAccessor.runAsync(
-        db,
-        "DELETE FROM memos WHERE content = (?)",
-        selectedContent.content
+      const selectedContent = this.rows.find(
+        (row) => row.content.split("\n")[0] === answer
       );
-    } catch (err) {
-      console.error(err.message);
-    }
 
-    await DBAccessor.closeAsync(db);
-  }
-}
+      console.log(selectedContent.content);
+      await DBAccessor.closeAsync(db);
+    } else if (this.option === "-d") {
+      const prompt = new Select({
+        name: "value",
+        message: this.questionMessage(),
+        choices: this.headers(),
+      });
+      const answer = await prompt.run();
 
-class CreateExecutor {
-  execute() {
-    process.stdin.resume();
-    process.stdin.setEncoding("utf8");
-    process.stdin.on("data", async function (chunk) {
+      const selectedContent = this.rows.find(
+        (row) => row.content.split("\n")[0] === answer
+      );
+
       try {
-        await DBAccessor.runAsync(db, "INSERT INTO memos VALUES (?)", chunk);
+        await DBAccessor.runAsync(
+          db,
+          "DELETE FROM memos WHERE content = (?)",
+          selectedContent.content
+        );
       } catch (err) {
         console.error(err.message);
+      } finally {
+        await DBAccessor.closeAsync(db);
       }
-
-      await DBAccessor.closeAsync(db);
-    });
+    } else {
+      process.stdin.resume();
+      process.stdin.setEncoding("utf8");
+      await process.stdin.on("data", async function (chunk) {
+        try {
+          await DBAccessor.runAsync(db, "INSERT INTO memos VALUES (?)", chunk);
+        } catch (err) {
+          console.error(err.message);
+        } finally {
+          await DBAccessor.closeAsync(db);
+        }
+      });
+    }
   }
 }
 
@@ -160,25 +131,6 @@ class DBAccessor {
   };
 }
 
-class EnquirerAccessor {
-  #choices;
-  #message;
-
-  constructor(choices, message) {
-    this.#choices = choices;
-    this.#message = message;
-  }
-
-  async executor() {
-    const prompt = new Select({
-      name: "value",
-      message: this.#message,
-      choices: this.#choices,
-    });
-
-    return await prompt.run();
-  }
-}
-
-const controller = new OptionController(option);
-controller.execute();
+const memo = new Memo(option);
+await memo.init();
+await memo.execute();
