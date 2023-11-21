@@ -1,0 +1,26 @@
+{
+  "name": "global-warming-survey",
+  "version": "1.0.0",
+  "description": "README",
+  "main": "main.js",
+  "scripts": {
+    "fix": "prettier --write . && eslint --fix .",
+    "lint": "prettier --check . && eslint ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "@typescript-eslint/parser": "^6.11.0",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "prettier": "^3.1.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "enquirer": "^2.4.1",
+    "typescript": "^5.2.2"
+  }
+}
