@@ -12,9 +12,9 @@ export class MemoModel {
     );
 
     const headers = await this.headers();
-    headers.forEach((header) => console.log(header));
-
     await this.close();
+
+    return headers.join("\n");
   };
 
   read = async () => {
@@ -23,9 +23,8 @@ export class MemoModel {
     );
 
     if (!(await this.rows()).length) {
-      console.log("メモは1件もありません");
       await this.close();
-      return;
+      return "メモは1件もありません";
     }
 
     const prompt = new Select({
@@ -35,9 +34,9 @@ export class MemoModel {
     });
 
     const selectedContent = await this.findTargetMemo(prompt);
-    console.log(selectedContent.content);
-
     await this.close();
+
+    return selectedContent.content;
   };
 
   delete = async () => {
@@ -46,9 +45,8 @@ export class MemoModel {
     );
 
     if (!(await this.rows()).length) {
-      console.log("メモは1件もありません");
       await this.close();
-      return;
+      return "メモは1件もありません";
     }
 
     const prompt = new Select({
@@ -69,6 +67,8 @@ export class MemoModel {
     } finally {
       await this.close();
     }
+
+    return "選択したメモを削除しました";
   };
 
   create = async () => {
@@ -87,6 +87,8 @@ export class MemoModel {
         await this.close();
       }
     });
+
+    return "メモを1件作成しました";
   };
 
   rows = async () => await this.all("SELECT content FROM memos");

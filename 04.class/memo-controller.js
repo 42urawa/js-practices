@@ -1,5 +1,6 @@
 import sqlite3 from "sqlite3";
 import { MemoModel } from "./memo-model.js";
+import { MemoView } from "./memo-view.js";
 
 export class MemoController {
   constructor(option) {
@@ -9,14 +10,19 @@ export class MemoController {
   }
 
   async execute() {
+    let showedMemoData;
+
     if (this.option === "-l") {
-      await this.memoModel.list();
+      showedMemoData = await this.memoModel.list();
     } else if (this.option === "-r") {
-      await this.memoModel.read();
+      showedMemoData = await this.memoModel.read();
     } else if (this.option === "-d") {
-      await this.memoModel.delete();
+      showedMemoData = await this.memoModel.delete();
     } else {
-      await this.memoModel.create();
+      showedMemoData = await this.memoModel.create();
     }
+
+    const memoView = new MemoView(showedMemoData);
+    memoView.show();
   }
 }
