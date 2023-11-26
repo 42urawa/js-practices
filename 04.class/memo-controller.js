@@ -4,7 +4,7 @@ import { Memo } from "./memo.js";
 
 const { Select } = enquirer;
 
-export class MemoController {
+export class MemoCLI {
   constructor(option) {
     this.option = option;
     const db = new sqlite3.Database("./memo.sqlite");

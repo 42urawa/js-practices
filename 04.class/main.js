@@ -1,6 +1,6 @@
-import { MemoController } from "./memo-controller.js";
+import { MemoCLI } from "./memo-controller.js";
 
 const option = process.argv.slice(2)[0];
 
-const memoController = new MemoController(option);
-await memoController.execute();
+const memoCLI = new MemoCLI(option);
+await memoCLI.execute();
