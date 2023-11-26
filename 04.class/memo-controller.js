@@ -26,7 +26,7 @@ export class MemoController {
   list = async () => {
     const headers = await this.memo.list();
 
-    if (!headers.length) {
+    if (headers.length <= 0) {
       console.log("メモは1件もありません");
     } else {
       console.log(headers.join("\n"));
@@ -38,7 +38,7 @@ export class MemoController {
   read = async () => {
     const headers = await this.memo.list();
 
-    if (!headers.length) {
+    if (headers.length <= 0) {
       console.log("メモは1件もありません");
     } else {
       const prompt = new Select({
@@ -59,7 +59,7 @@ export class MemoController {
   delete = async () => {
     const headers = await this.memo.list();
 
-    if (!headers.length) {
+    if (headers.length <= 0) {
       console.log("メモは1件もありません");
     } else {
       const prompt = new Select({
