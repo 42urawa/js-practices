@@ -24,14 +24,10 @@ export class Memo {
 
     const selectedMemo = await this.findTargetMemo(header);
 
-    try {
-      await this.run(
-        "DELETE FROM memos WHERE content = (?)",
-        selectedMemo.content
-      );
-    } catch (err) {
-      console.error(err.message);
-    }
+    await this.run(
+      "DELETE FROM memos WHERE content = (?)",
+      selectedMemo.content
+    );
   };
 
   create = async (content) => {
