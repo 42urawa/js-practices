@@ -1,4 +1,4 @@
-import { MemoCLI } from "./memo-controller.js";
+import { MemoCLI } from "./memo-cli.js";
 
 const option = process.argv.slice(2)[0];
 
