@@ -3,7 +3,7 @@ import https from "https";
 import enquirer from "enquirer";
 import { prefectures } from "./prefecture.js";
 import { cities } from "./city.js";
-import { type } from "os";
+
 const { Select } = enquirer;
 
 const promptPrefecture = new Select({
@@ -22,10 +22,10 @@ const promptCity = new Select({
 });
 
 const city = await promptCity.run();
-console.log(city, cities[prefecture][city]);
+const pointNumber = cities[prefecture][city];
 
-let baseYears = ["今年"];
-for (let year = 2023; year >= 1980; year--) {
+let baseYears = ["本日"];
+for (let year = new Date().getFullYear(); year >= 1976; year--) {
   baseYears.push(`${year} 年`);
 }
 
@@ -35,37 +35,37 @@ const promptBaseYear = new Select({
   choices: baseYears,
 });
 
-const baseYear = parseInt(
-  await promptBaseYear.run(),
-  // .replace(" 年", "").trim(),
-);
-console.log(baseYear, typeof baseYear);
+let baseYear, month;
+const answerBaseYear = await promptBaseYear.run();
+if (answerBaseYear === "本日") {
+  const today = new Date();
+  baseYear = today.getFullYear();
+  month = today.getMonth() + 1;
+} else {
+  baseYear = parseInt(answerBaseYear);
 
-const baseMonths = [
-  " 1 月",
-  " 2 月",
-  " 3 月",
-  " 4 月",
-  " 5 月",
-  " 6 月",
-  " 7 月",
-  " 8 月",
-  " 9 月",
-  "10 月",
-  "11 月",
-  "12 月",
-];
-const promptBaseMonth = new Select({
-  name: "value",
-  message: "基準月を選んでください。",
-  choices: baseMonths,
-});
+  const months = [
+    " 1 月",
+    " 2 月",
+    " 3 月",
+    " 4 月",
+    " 5 月",
+    " 6 月",
+    " 7 月",
+    " 8 月",
+    " 9 月",
+    "10 月",
+    "11 月",
+    "12 月",
+  ];
+  const promptMonth = new Select({
+    name: "value",
+    message: "基準月を選んでください。",
+    choices: months,
+  });
 
-const baseMonth = parseInt(
-  await promptBaseMonth.run(),
-  // .replace("月", "").trim(),
-);
-console.log(baseMonth, typeof baseMonth);
+  month = parseInt(await promptMonth.run());
+}
 
 const comparisonPeriods = [" 1 年前", " 5 年前", "10 年前", "30 年前"];
 const promptComparisonPeriod = new Select({
@@ -74,23 +74,39 @@ const promptComparisonPeriod = new Select({
   choices: comparisonPeriods,
 });
 
-const comparisonPeriod = parseInt(
-  await promptComparisonPeriod.run(),
-  // .replace("年前", "").trim(),
-);
-console.log(comparisonPeriod, typeof comparisonPeriod);
+const comparisonPeriod = parseInt(await promptComparisonPeriod.run());
+const targetYear = Math.max(baseYear - comparisonPeriod, 1970);
 
-const url = "https://api.cultivationdata.net/past?no=47598&year=2022&month=8";
-const options = {
+const baseURL = `https://api.cultivationdata.net/past?no=${pointNumber}&year=${baseYear}&month=${month}`;
+const targetURL = `https://api.cultivationdata.net/past?no=${pointNumber}&year=${targetYear}&month=${month}`;
+
+const baseOptions = {
   method: "GET",
   headers: { "content-type": "application/x-www-form-urlencoded" },
-  url,
+  url: baseURL,
+  httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+};
+const targetOptions = {
+  method: "GET",
+  headers: { "content-type": "application/x-www-form-urlencoded" },
+  url: targetURL,
   httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 };
 
 try {
-  const res = await axios(options);
-  console.log(res.data);
+  const responses = await Promise.all([
+    axios(baseOptions),
+    axios(targetOptions),
+  ]);
+  const labels = Object.keys(responses[0].data[city]);
+
+  const data = responses.map((response) => {
+    return Object.values(response.data[city]).map((obj) => obj["平均気温"]);
+  });
+
+  console.log(labels);
+  console.log(data[0]);
+  console.log(data[1]);
 } catch (err) {
-  console.error(err);
+  console.error(err.message);
 }
