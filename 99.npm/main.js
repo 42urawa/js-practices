@@ -1,3 +1,5 @@
+import express from "express";
+import open from "open";
 import axios from "axios";
 import https from "https";
 import enquirer from "enquirer";
@@ -5,7 +7,6 @@ import { prefectures } from "./prefecture.js";
 import { cities } from "./city.js";
 
 const { Select } = enquirer;
-
 const promptPrefecture = new Select({
   name: "value",
   message: "都道府県を選んでください。",
@@ -13,7 +14,6 @@ const promptPrefecture = new Select({
 });
 
 const prefecture = await promptPrefecture.run();
-console.log(cities[prefecture]);
 
 const promptCity = new Select({
   name: "value",
@@ -93,20 +93,61 @@ const targetOptions = {
   httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 };
 
-try {
-  const responses = await Promise.all([
-    axios(baseOptions),
-    axios(targetOptions),
-  ]);
-  const labels = Object.keys(responses[0].data[city]);
+const responses = await Promise.all([axios(baseOptions), axios(targetOptions)]);
+const labels = Object.keys(responses[0].data[city]);
 
-  const data = responses.map((response) => {
-    return Object.values(response.data[city]).map((obj) => obj["平均気温"]);
-  });
+const data = responses.map((response) => {
+  return Object.values(response.data[city]).map((obj) => obj["平均気温"]);
+});
 
-  console.log(labels);
-  console.log(data[0]);
-  console.log(data[1]);
-} catch (err) {
-  console.error(err.message);
-}
+const app = express();
+const port = 3000;
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.get("/", (req, res) => {
+  res.send(`
+  <html>
+  <head>
+    <title>GlobalWarmingSurvey</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <h1 id="title"></h1>
+    <canvas id="myChart" width="300" height="100"></canvas>
+    <script>
+      const text = "${city} の温暖化傾向（${comparisonPeriod}年前）";
+      document.getElementById("title").textContent = text;
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ${JSON.stringify(labels)},
+          datasets: [{
+            label: '今',
+            backgroundColor: 'rgb(0, 0, 0)',
+            borderColor: 'rgb(255, 0, 0)',
+            data: ${JSON.stringify(data[0])}, 
+          },
+          {
+            label: '昔',
+            backgroundColor: 'rgb(0, 0, 0)',
+            borderColor: 'rgb(0, 0, 255)',
+            data: ${JSON.stringify(data[1])}, 
+          }]
+        },
+        options: {}
+      });
+    </script>
+  </body>
+  </html>
+
+  `);
+});
+
+app.listen(port, () => {
+  console.log(`Server is runnnin on port ${port}`);
+});
+
+open(`http://localhost:${port}`);
