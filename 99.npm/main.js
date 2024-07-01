@@ -39,6 +39,7 @@ const main = async () => {
   });
 
   const baseYear = (await promptBaseYear.run()).replace(/[^0-9]/g, "");
+  console.log(typeof baseYear);
 
   const targetYears = [];
   for (let year = baseYear - 1; year >= minYear; year--) {
@@ -86,23 +87,6 @@ const main = async () => {
     await page.$$eval("td", (elements) => elements.map((e) => e.textContent))
   ).slice(surveyDataStartIndex, surveyDataEndIndex);
 
-  const totalColumns = baseSurveyPoint.totalColumns();
-  const dateIndex = 0;
-  const averageTemperatureIndex = baseSurveyPoint.averageTemperatureIndex();
-  const highestTemperatureIndex = baseSurveyPoint.highestTemperatureIndex();
-
-  const labels = baseData
-    .filter((_, i) => i % totalColumns === dateIndex)
-    .map((v) => v + "日");
-
-  const baseAverageTemperatures = baseData.filter(
-    (_, i) => i % totalColumns === averageTemperatureIndex,
-  );
-
-  const baseHighestTemperatures = baseData.filter(
-    (_, i) => i % totalColumns === highestTemperatureIndex,
-  );
-
   await page.goto(targetSurveyPoint.url());
 
   const targetData = (
@@ -111,23 +95,67 @@ const main = async () => {
 
   await browser.close();
 
-  const targetAverageTemperatures = targetData.filter(
-    (_, i) => i % totalColumns === averageTemperatureIndex,
+  const totalColumns = baseSurveyPoint.totalColumns();
+  const dateIndex = 0;
+  const averageTemperatureIndex = baseSurveyPoint.averageTemperatureIndex();
+  const highestTemperatureIndex = baseSurveyPoint.highestTemperatureIndex();
+
+  // 閏年対応含む
+  const labels = (baseData.length >= targetData.length ? baseData : targetData)
+    .filter((_, i) => i % totalColumns === dateIndex)
+    .map((v) => v + "日");
+
+  const collectTemperatures = (baseData, index) =>
+    baseData
+      .filter((_, i) => i % totalColumns === index)
+      // イレギュラー文字対策
+      .map((v) => parseFloat(v));
+
+  const baseAverageTemperatures = collectTemperatures(
+    baseData,
+    averageTemperatureIndex,
+  );
+  const baseHighestTemperatures = collectTemperatures(
+    baseData,
+    highestTemperatureIndex,
+  );
+  const targetAverageTemperatures = collectTemperatures(
+    targetData,
+    averageTemperatureIndex,
+  );
+  const targetHighestTemperatures = collectTemperatures(
+    targetData,
+    highestTemperatureIndex,
   );
 
-  const targetHighestTemperatures = targetData.filter(
-    (_, i) => i % totalColumns === highestTemperatureIndex,
-  );
-
-  const averageTemperaturedata = [
+  const averageTemperatureData = [
     baseAverageTemperatures,
     targetAverageTemperatures,
   ];
 
-  const highestTemperaturedata = [
+  const highestTemperatureData = [
     baseHighestTemperatures,
     targetHighestTemperatures,
   ];
+
+  const calculateAverage = (temperatures) =>
+    temperatures.reduce(
+      (accumulator, currentValue) => accumulator + currentValue,
+      0,
+    ) / temperatures.length;
+
+  const averageOfBaseAverageTemperatures = calculateAverage(
+    baseAverageTemperatures,
+  );
+  const averageOfTargetAverageTemperatures = calculateAverage(
+    targetAverageTemperatures,
+  );
+  const averageOfBaseHighestTemperatures = calculateAverage(
+    baseHighestTemperatures,
+  );
+  const averageOfTargetHighestTemperatures = calculateAverage(
+    targetHighestTemperatures,
+  );
 
   const app = express();
   const port = 3000;
@@ -144,13 +172,31 @@ const main = async () => {
       </head>
       <body>
         <h1 id="title"></h1>
+        <h2 id="average"></h2>
         <canvas id="myChart" width="300" height="100"></canvas>
+        <h2 id="highest"></h2>
         <canvas id="myChart2" width="300" height="100"></canvas>
         <script>
-          const text = "${city} の温暖化傾向（上：平均気温　下：最高気温）";
+          const titleText = "${city} の温暖化傾向（上：平均気温　下：最高気温）";
+          const averageText = "平均気温の平均上昇値：${
+            Math.round(
+              (averageOfBaseAverageTemperatures -
+                averageOfTargetAverageTemperatures) *
+                10,
+            ) / 10
+          } ℃";
+          const highestText = "最高気温の平均上昇値：${
+            Math.round(
+              (averageOfBaseHighestTemperatures -
+                averageOfTargetHighestTemperatures) *
+                10,
+            ) / 10
+          } ℃";
           const baseLabel = "${baseYear} 年 ${month} 月";
           const targetLabel = "${targetYear} 年 ${month} 月";
-          document.getElementById("title").textContent = text;
+          document.getElementById("title").textContent = titleText;
+          document.getElementById("average").textContent = averageText;
+          document.getElementById("highest").textContent = highestText;
           var ctx = document.getElementById('myChart').getContext('2d');
           var myChart = new Chart(ctx, {
             type: 'line',
@@ -160,13 +206,13 @@ const main = async () => {
                 label: baseLabel,
                 backgroundColor: 'rgb(0, 0, 0)',
                 borderColor: 'rgb(255, 0, 0)',
-                data: ${JSON.stringify(averageTemperaturedata[0])},
+                data: ${JSON.stringify(averageTemperatureData[0])},
               },
               {
                 label: targetLabel,
                 backgroundColor: 'rgb(0, 0, 0)',
                 borderColor: 'rgb(0, 0, 255)',
-                data: ${JSON.stringify(averageTemperaturedata[1])},
+                data: ${JSON.stringify(averageTemperatureData[1])},
               }]
             },
             options: {}
@@ -180,13 +226,13 @@ const main = async () => {
                 label: baseLabel,
                 backgroundColor: 'rgb(0, 0, 0)',
                 borderColor: 'rgb(255, 0, 0)',
-                data: ${JSON.stringify(highestTemperaturedata[0])},
+                data: ${JSON.stringify(highestTemperatureData[0])},
               },
               {
                 label: targetLabel,
                 backgroundColor: 'rgb(0, 0, 0)',
                 borderColor: 'rgb(0, 0, 255)',
-                data: ${JSON.stringify(highestTemperaturedata[1])},
+                data: ${JSON.stringify(highestTemperatureData[1])},
               }]
             },
             options: {}
@@ -197,11 +243,16 @@ const main = async () => {
     `);
   });
 
-  app.listen(port, () => {
+  const server = app.listen(port, () => {
     console.log(`Server is runnnin on port ${port}`);
+    console.log(`"Please press Ctrl + C to exit."`);
   });
 
   open(`http://localhost:${port}`);
+
+  setTimeout(() => {
+    server.close();
+  }, 10000);
 };
 
 main();
