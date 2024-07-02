@@ -7,13 +7,19 @@ const majorPageAverageTemperatureIndex = 6;
 const minorPageAverageTemperatureIndex = 4;
 const majorPageHighestTemperatureIndex = 7;
 const minorPageHighestTemperatureIndex = 5;
+const surveyDataStartIndex = 22;
+const surveyDataEndIndex = -4;
 
-export class SurveyPoint {
+export class SurveyDataSource {
   constructor(obj) {
     this.precNo = obj.precNo;
     this.blockNo = obj.blockNo;
     this.year = obj.year;
     this.month = obj.month;
+  }
+
+  static formatData(data) {
+    return data.slice(surveyDataStartIndex, surveyDataEndIndex);
   }
 
   pageType() {

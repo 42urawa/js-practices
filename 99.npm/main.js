@@ -1,74 +1,18 @@
 import express from "express";
 import open from "open";
-import puppeteer from "puppeteer";
 import { SurveyCLI } from "./surveyCLI.js";
-
-const surveyDataStartIndex = 22;
-const surveyDataEndIndex = -4;
 
 const main = async () => {
   const surveyCLI = new SurveyCLI();
-  const [baseSurveyPoint, targetSurveyPoint, city] = await surveyCLI.execute();
-
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-
-  await page.goto(baseSurveyPoint.url());
-
-  const baseData = (
-    await page.$$eval("td", (elements) => elements.map((e) => e.textContent))
-  ).slice(surveyDataStartIndex, surveyDataEndIndex);
-
-  await page.goto(targetSurveyPoint.url());
-
-  const targetData = (
-    await page.$$eval("td", (elements) => elements.map((e) => e.textContent))
-  ).slice(surveyDataStartIndex, surveyDataEndIndex);
-
-  await browser.close();
-
-  const totalColumns = baseSurveyPoint.totalColumns();
-  const dateIndex = 0;
-  const averageTemperatureIndex = baseSurveyPoint.averageTemperatureIndex();
-  const highestTemperatureIndex = baseSurveyPoint.highestTemperatureIndex();
-
-  // 閏年対応含む
-  const labels = (baseData.length >= targetData.length ? baseData : targetData)
-    .filter((_, i) => i % totalColumns === dateIndex)
-    .map((v) => v + "日");
-
-  const collectTemperatures = (baseData, index) =>
-    baseData
-      .filter((_, i) => i % totalColumns === index)
-      // イレギュラー文字対策
-      .map((v) => parseFloat(v));
-
-  const baseAverageTemperatures = collectTemperatures(
-    baseData,
-    averageTemperatureIndex,
-  );
-  const baseHighestTemperatures = collectTemperatures(
-    baseData,
-    highestTemperatureIndex,
-  );
-  const targetAverageTemperatures = collectTemperatures(
-    targetData,
-    averageTemperatureIndex,
-  );
-  const targetHighestTemperatures = collectTemperatures(
-    targetData,
-    highestTemperatureIndex,
-  );
-
-  const averageTemperatureData = [
-    baseAverageTemperatures,
-    targetAverageTemperatures,
-  ];
-
-  const highestTemperatureData = [
-    baseHighestTemperatures,
-    targetHighestTemperatures,
-  ];
+  const {
+    labels,
+    averageTemperatureData,
+    highestTemperatureData,
+    city,
+    baseYear,
+    targetYear,
+    month,
+  } = await surveyCLI.execute();
 
   const calculateAverage = (temperatures) =>
     temperatures.reduce(
@@ -76,18 +20,17 @@ const main = async () => {
       0,
     ) / temperatures.length;
 
-  const averageOfBaseAverageTemperatures = calculateAverage(
-    baseAverageTemperatures,
-  );
-  const averageOfTargetAverageTemperatures = calculateAverage(
-    targetAverageTemperatures,
-  );
-  const averageOfBaseHighestTemperatures = calculateAverage(
-    baseHighestTemperatures,
-  );
-  const averageOfTargetHighestTemperatures = calculateAverage(
-    targetHighestTemperatures,
-  );
+  const [
+    averageOfBaseAverageTemperatures,
+    averageOfTargetAverageTemperatures,
+    averageOfBaseHighestTemperatures,
+    averageOfTargetHighestTemperatures,
+  ] = [
+    calculateAverage(averageTemperatureData[0]),
+    calculateAverage(averageTemperatureData[1]),
+    calculateAverage(highestTemperatureData[0]),
+    calculateAverage(highestTemperatureData[1]),
+  ];
 
   const app = express();
   const port = 3000;
@@ -124,12 +67,8 @@ const main = async () => {
                 10,
             ) / 10
           } ℃";
-          const baseLabel = "${baseSurveyPoint.year} 年 ${
-            baseSurveyPoint.month
-          } 月";
-          const targetLabel = "${targetSurveyPoint.year} 年 ${
-            targetSurveyPoint.month
-          } 月";
+          const baseLabel = "${baseYear} 年 ${month} 月";
+          const targetLabel = "${targetYear} 年 ${month} 月";
           document.getElementById("title").textContent = titleText;
           document.getElementById("average").textContent = averageText;
           document.getElementById("highest").textContent = highestText;
