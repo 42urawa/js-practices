@@ -8,7 +8,7 @@
 - **Web Scraping**: Scrapes the Japan Meteorological Agency's website for average and maximum temperatures based on user input.
 - **Data Visualization**: Uses the Chart.js library to display the scraped data as a line graph.
 
-![Result Example](resultExample.png)
+![image](https://github.com/kitarou888/js-practices/assets/85793702/350d1ef4-5200-4a42-9027-340f6a58b59b)
 
 - **Server Activation**: Starts a local server using the Express library, allowing users to view the results in their browser.
 
@@ -42,10 +42,11 @@ Alternatively, you can add the following to `package.json` to make it executable
 }
 ```
 
-1. Answer the questions prompted by the Enquirer library.
+2. Answer the questions prompted by the Enquirer library.
 
-![Select Prefecture](selectPrefecture.png)
-![Select Survey Point](selectSurveyPoint.png)
+<img width="937" alt="image" src="https://github.com/kitarou888/js-practices/assets/85793702/43d063ce-5fe5-4915-9663-23d3d337fe0d">
+
+<img width="934" alt="image" src="https://github.com/kitarou888/js-practices/assets/85793702/c907bfc1-f774-4b5e-abbc-b72e75dba574">
 
 3. After all questions are answered:
 
