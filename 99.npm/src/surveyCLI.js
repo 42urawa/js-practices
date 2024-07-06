@@ -11,7 +11,7 @@ export class SurveyCLI {
   async execute() {
     const promptPrefecture = new Select({
       name: "value",
-      message: "都道府県または地方を選んでください。",
+      message: "都道府県を選んでください。",
       choices: Object.keys(cities),
     });
     const prefecture = await promptPrefecture.run();
