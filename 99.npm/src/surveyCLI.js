@@ -70,8 +70,8 @@ export class SurveyCLI {
       }),
     ];
 
-    // スクレイピングをsurveyDataSourceオブジェクトごとにさせるのは非効率につき
-    // SurveyCLIクラスでまとめて実施
+    // Since it is inefficient to have each surveyDataSource object do the scraping,
+    // the SurveyCLI class is used to do it all together.
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
@@ -98,7 +98,7 @@ export class SurveyCLI {
     const baseFormattedData = SurveyDataSource.formatData(basePageData);
     const targetFormattedData = SurveyDataSource.formatData(targetPageData);
 
-    // 閏年対応含む
+    // Includes leap year support
     const labels = (
       baseFormattedData.length >= targetFormattedData.length
         ? baseFormattedData
@@ -110,7 +110,7 @@ export class SurveyCLI {
     const collectTemperatures = (baseData, index) =>
       baseData
         .filter((_, i) => i % totalColumns === index)
-        // イレギュラー文字対策
+        // for irregular character
         .map((v) => parseFloat(v));
 
     const [

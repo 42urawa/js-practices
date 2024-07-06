@@ -2,6 +2,8 @@ import express from "express";
 import open from "open";
 import { SurveyCLI } from "./surveyCLI.js";
 
+const endTime = 5000;
+
 const main = async () => {
   const surveyCLI = new SurveyCLI();
   const {
@@ -120,14 +122,14 @@ const main = async () => {
 
   const server = app.listen(port, () => {
     console.log(`Server is runnnin on port ${port}`);
-    console.log(`"This will exit in 10 seconds."`);
+    console.log(`"This will end in 5 seconds."`);
   });
 
   open(`http://localhost:${port}`);
 
   setTimeout(() => {
     server.close();
-  }, 10000);
+  }, endTime);
 };
 
 main();
