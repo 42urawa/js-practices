@@ -54,7 +54,7 @@ const main = async () => {
         <h2 id="highest"></h2>
         <canvas id="myChart2" width="300" height="100"></canvas>
         <script>
-          const titleText = "${city} の温暖化傾向（上：平均気温　下：最高気温）";
+          const titleText = "${city} の温暖化傾向（上：平均気温  下：最高気温）";
           const averageText = "平均気温の平均上昇値：${
             Math.round(
               (averageOfBaseAverageTemperatures -
