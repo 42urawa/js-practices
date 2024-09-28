@@ -50,9 +50,9 @@ const main = async () => {
       <body>
         <h1 id="title"></h1>
         <h2 id="average"></h2>
-        <canvas id="myChart" width="300" height="100"></canvas>
+        <canvas id="averageTemperatureChart" width="300" height="100"></canvas>
         <h2 id="highest"></h2>
-        <canvas id="myChart2" width="300" height="100"></canvas>
+        <canvas id="highestTemperatureChart" width="300" height="100"></canvas>
         <script>
           const titleText = "${city} の温暖化傾向（上：平均気温  下：最高気温）";
           const averageText = "平均気温の平均上昇値：${
@@ -74,8 +74,8 @@ const main = async () => {
           document.getElementById("title").textContent = titleText;
           document.getElementById("average").textContent = averageText;
           document.getElementById("highest").textContent = highestText;
-          const ctx = document.getElementById('myChart').getContext('2d');
-          const myChart = new Chart(ctx, {
+          const averageTemperatureCtx = document.getElementById('averageTemperatureChart').getContext('2d');
+          const averageTemperatureChart = new Chart(averageTemperatureCtx, {
             type: 'line',
             data: {
               labels: ${JSON.stringify(labels)},
@@ -94,8 +94,8 @@ const main = async () => {
             },
             options: {}
           });
-          const ctx2 = document.getElementById('myChart2').getContext('2d');
-          const myChart2 = new Chart(ctx2, {
+          const highestTemperatureCtx = document.getElementById('highestTemperatureChart').getContext('2d');
+          const highestTemperatureChart = new Chart(highestTemperatureCtx, {
             type: 'line',
             data: {
               labels: ${JSON.stringify(labels)},
