@@ -60,14 +60,14 @@ const main = async () => {
               (averageOfBaseAverageTemperatures -
                 averageOfTargetAverageTemperatures) *
                 10,
-            ) / 10
+            ) / 10 || "-"
           } ℃";
           const highestText = "最高気温の平均上昇値：${
             Math.round(
               (averageOfBaseHighestTemperatures -
                 averageOfTargetHighestTemperatures) *
                 10,
-            ) / 10
+            ) / 10 || "-"
           } ℃";
           const baseLabel = "${baseYear} 年 ${month} 月";
           const targetLabel = "${targetYear} 年 ${month} 月";
