@@ -74,8 +74,8 @@ const main = async () => {
           document.getElementById("title").textContent = titleText;
           document.getElementById("average").textContent = averageText;
           document.getElementById("highest").textContent = highestText;
-          var ctx = document.getElementById('myChart').getContext('2d');
-          var myChart = new Chart(ctx, {
+          const ctx = document.getElementById('myChart').getContext('2d');
+          const myChart = new Chart(ctx, {
             type: 'line',
             data: {
               labels: ${JSON.stringify(labels)},
@@ -94,8 +94,8 @@ const main = async () => {
             },
             options: {}
           });
-          var ctx2 = document.getElementById('myChart2').getContext('2d');
-          var myChart2 = new Chart(ctx2, {
+          const ctx2 = document.getElementById('myChart2').getContext('2d');
+          const myChart2 = new Chart(ctx2, {
             type: 'line',
             data: {
               labels: ${JSON.stringify(labels)},
