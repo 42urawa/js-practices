@@ -25,32 +25,32 @@ export class SurveyCLI {
 
     const baseYears = [];
     for (let year = new Date().getFullYear(); year >= minYear + 1; year--) {
-      baseYears.push(`${year} 年`);
+      baseYears.push({ message: `${year} 年`, name: year });
     }
     const promptBaseYear = new Select({
       name: "value",
       message: "基準年を選んでください。",
       choices: baseYears,
     });
-    const baseYear = (await promptBaseYear.run()).replace(/[^0-9]/g, "");
+    const baseYear = await promptBaseYear.run();
 
     const targetYears = [];
     for (let year = baseYear - 1; year >= minYear; year--) {
-      targetYears.push(`${year} 年`);
+      targetYears.push({ message: `${year} 年`, name: year });
     }
     const promptTargetYear = new Select({
       name: "value",
       message: "比較年を選んでください。",
       choices: targetYears,
     });
-    const targetYear = (await promptTargetYear.run()).replace(/[^0-9]/g, "");
+    const targetYear = await promptTargetYear.run();
 
     const promptMonth = new Select({
       name: "value",
       message: "基準月を選んでください。",
       choices: months,
     });
-    const month = (await promptMonth.run()).replace(/[^0-9]/g, "");
+    const month = await promptMonth.run();
 
     const precNo = cities[prefecture][city].precNo;
     const blockNo = cities[prefecture][city].blockNo;
