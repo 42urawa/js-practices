@@ -59,7 +59,35 @@ export class SurveyCLI {
       month,
     });
 
-    const template = surveyControlService.fetchData();
-    return template;
+    // const template = surveyControlService.fetchData();
+    // return template;
+
+    const {
+      label,
+      baseAverageTemperatures,
+      baseHighestTemperatures,
+      targetAverageTemperatures,
+      targetHighestTemperatures,
+      averageOfBaseAverageTemperatures,
+      averageOfTargetAverageTemperatures,
+      averageOfBaseHighestTemperatures,
+      averageOfTargetHighestTemperatures,
+    } = await surveyControlService.fetchData();
+
+    return {
+      city,
+      label,
+      baseAverageTemperatures,
+      baseHighestTemperatures,
+      targetAverageTemperatures,
+      targetHighestTemperatures,
+      averageOfBaseAverageTemperatures,
+      averageOfTargetAverageTemperatures,
+      averageOfBaseHighestTemperatures,
+      averageOfTargetHighestTemperatures,
+      baseYear,
+      targetYear,
+      month,
+    };
   }
 }

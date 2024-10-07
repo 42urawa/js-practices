@@ -43,8 +43,25 @@ export class SurveyControlService {
       month: this.month,
     });
 
-    const template = surveyView.createTemplate();
+    // const template = surveyView.createTemplate();
+    // return template;
+    const {
+      averageOfBaseAverageTemperatures,
+      averageOfTargetAverageTemperatures,
+      averageOfBaseHighestTemperatures,
+      averageOfTargetHighestTemperatures,
+    } = surveyView.createTemplate();
 
-    return template;
+    return {
+      label,
+      baseAverageTemperatures,
+      baseHighestTemperatures,
+      targetAverageTemperatures,
+      targetHighestTemperatures,
+      averageOfBaseAverageTemperatures,
+      averageOfTargetAverageTemperatures,
+      averageOfBaseHighestTemperatures,
+      averageOfTargetHighestTemperatures,
+    };
   }
 }
