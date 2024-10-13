@@ -13,18 +13,22 @@ const main = async () => {
 
   const {
     city,
-    label,
-    baseAverageTemperatures,
-    baseHighestTemperatures,
-    targetAverageTemperatures,
-    targetHighestTemperatures,
-    averageOfBaseAverageTemperatures,
-    averageOfTargetAverageTemperatures,
-    averageOfBaseHighestTemperatures,
-    averageOfTargetHighestTemperatures,
     baseYear,
     targetYear,
     month,
+    label,
+    baseHighestTemperatures,
+    baseAverageTemperatures,
+    baseLowestTemperatures,
+    targetHighestTemperatures,
+    targetAverageTemperatures,
+    targetLowestTemperatures,
+    averageOfBaseHighestTemperatures,
+    averageOfBaseAverageTemperatures,
+    averageOfBaseLowestTemperatures,
+    averageOfTargetHighestTemperatures,
+    averageOfTargetAverageTemperatures,
+    averageOfTargetLowestTemperatures,
   } = await surveyCLI.execute();
 
   const app = express();
@@ -44,18 +48,22 @@ const main = async () => {
   app.get("/", (_, res) => {
     res.render("index", {
       city,
-      label: label.join(","),
-      baseAverageTemperatures: baseAverageTemperatures.join(","),
-      baseHighestTemperatures: baseHighestTemperatures.join(","),
-      targetAverageTemperatures: targetAverageTemperatures.join(","),
-      targetHighestTemperatures: targetHighestTemperatures.join(","),
-      averageOfBaseAverageTemperatures,
-      averageOfTargetAverageTemperatures,
-      averageOfBaseHighestTemperatures,
-      averageOfTargetHighestTemperatures,
       baseYear,
       targetYear,
       month,
+      label: label.join(","),
+      baseHighestTemperatures: baseHighestTemperatures.join(","),
+      baseAverageTemperatures: baseAverageTemperatures.join(","),
+      baseLowestTemperatures: baseLowestTemperatures.join(","),
+      targetHighestTemperatures: targetHighestTemperatures.join(","),
+      targetAverageTemperatures: targetAverageTemperatures.join(","),
+      targetLowestTemperatures: targetLowestTemperatures.join(","),
+      averageOfBaseHighestTemperatures,
+      averageOfBaseAverageTemperatures,
+      averageOfBaseLowestTemperatures,
+      averageOfTargetHighestTemperatures,
+      averageOfTargetAverageTemperatures,
+      averageOfTargetLowestTemperatures,
     });
   });
 

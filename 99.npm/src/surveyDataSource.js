@@ -6,20 +6,22 @@ const minorPageType = "a1";
 const majorPageTotalColumns = 21;
 const minorPageTotalColumns = 18;
 const labelDateIndex = 0;
-const majorPageAverageTemperatureIndex = 6;
 const majorPageHighestTemperatureIndex = 7;
-const minorPageAverageTemperatureIndex = 4;
+const majorPageAverageTemperatureIndex = 6;
+const majorPageLowestTemperatureIndex = 8;
 const minorPageHighestTemperatureIndex = 5;
+const minorPageAverageTemperatureIndex = 4;
+const minorPageLowestTemperatureIndex = 6;
 const surveyDataStartIndex = 22;
 const surveyDataEndIndex = -4;
 
 export class SurveyDataSource {
-  constructor(obj) {
-    this.precNo = obj.precNo;
-    this.blockNo = obj.blockNo;
-    this.baseYear = obj.baseYear;
-    this.targetYear = obj.targetYear;
-    this.month = obj.month;
+  constructor(info) {
+    this.precNo = info.precNo;
+    this.blockNo = info.blockNo;
+    this.baseYear = info.baseYear;
+    this.targetYear = info.targetYear;
+    this.month = info.month;
   }
 
   async read() {
@@ -57,23 +59,29 @@ export class SurveyDataSource {
         .map((v) => parseFloat(v));
 
     const [
-      baseAverageTemperatures,
       baseHighestTemperatures,
-      targetAverageTemperatures,
+      baseAverageTemperatures,
+      baseLowestTemperatures,
       targetHighestTemperatures,
+      targetAverageTemperatures,
+      targetLowestTemperatures,
     ] = [
-      collectTemperatures(baseFormattedData, this.averageTemperatureIndex()),
       collectTemperatures(baseFormattedData, this.highestTemperatureIndex()),
-      collectTemperatures(targetFormattedData, this.averageTemperatureIndex()),
+      collectTemperatures(baseFormattedData, this.averageTemperatureIndex()),
+      collectTemperatures(baseFormattedData, this.lowestTemperatureIndex()),
       collectTemperatures(targetFormattedData, this.highestTemperatureIndex()),
+      collectTemperatures(targetFormattedData, this.averageTemperatureIndex()),
+      collectTemperatures(targetFormattedData, this.lowestTemperatureIndex()),
     ];
 
     return {
       label,
-      baseAverageTemperatures,
       baseHighestTemperatures,
-      targetAverageTemperatures,
+      baseAverageTemperatures,
+      baseLowestTemperatures,
       targetHighestTemperatures,
+      targetAverageTemperatures,
+      targetLowestTemperatures,
     };
   }
 
@@ -99,15 +107,21 @@ export class SurveyDataSource {
       : minorPageTotalColumns;
   }
 
+  highestTemperatureIndex() {
+    return this.blockNo.length === majorBlockNoDigit
+      ? majorPageHighestTemperatureIndex
+      : minorPageHighestTemperatureIndex;
+  }
+
   averageTemperatureIndex() {
     return this.blockNo.length === majorBlockNoDigit
       ? majorPageAverageTemperatureIndex
       : minorPageAverageTemperatureIndex;
   }
 
-  highestTemperatureIndex() {
+  lowestTemperatureIndex() {
     return this.blockNo.length === majorBlockNoDigit
-      ? majorPageHighestTemperatureIndex
-      : minorPageHighestTemperatureIndex;
+      ? majorPageLowestTemperatureIndex
+      : minorPageLowestTemperatureIndex;
   }
 }

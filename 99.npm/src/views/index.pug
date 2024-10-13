@@ -3,15 +3,37 @@ html
     title GlobalWarmingSurvey
     script(src="https://cdn.jsdelivr.net/npm/chart.js")
   body
-    h1#title #{city} の温暖化傾向（上：平均気温  下：最高気温）
-    h2#average 平均気温の平均上昇値：#{Math.round((averageOfBaseAverageTemperatures - averageOfTargetAverageTemperatures) * 10) / 10 || "-"} ℃
-    canvas#averageTemperatureChart(width="300" height="100")
+    h1#title #{city} の温暖化傾向（上段：最高気温  中段：平均気温  下段：最低気温）
     h2#highest 最高気温の平均上昇値：#{Math.round((averageOfBaseHighestTemperatures - averageOfTargetHighestTemperatures) * 10) / 10 || "-"} ℃
     canvas#highestTemperatureChart(width="300" height="100")
+    h2#average 平均気温の平均上昇値：#{Math.round((averageOfBaseAverageTemperatures - averageOfTargetAverageTemperatures) * 10) / 10 || "-"} ℃
+    canvas#averageTemperatureChart(width="300" height="100")
+    h2#highest 最低気温の平均上昇値：#{Math.round((averageOfBaseLowestTemperatures - averageOfTargetLowestTemperatures) * 10) / 10 || "-"} ℃
+    canvas#lowestTemperatureChart(width="300" height="100")
     script.
       const baseLabel = "#{baseYear} 年 #{month} 月";
       const targetLabel = "#{targetYear} 年 #{month} 月";
       const line = 'line'
+      const highestTemperatureCtx = document.getElementById('highestTemperatureChart').getContext('2d');
+      const highestTemperatureChart = new Chart(highestTemperatureCtx, {
+        type: line,
+        data: {
+          labels: "#{label}".split(','),
+          datasets: [{
+            label: baseLabel,
+            backgroundColor: 'rgb(0, 0, 0)',
+            borderColor: 'rgb(255, 0, 0)',
+            data: "#{baseHighestTemperatures}".split(','),
+          },
+          {
+            label: targetLabel,
+            backgroundColor: 'rgb(0, 0, 0)',
+            borderColor: 'rgb(0, 0, 255)',
+            data: "#{targetHighestTemperatures}".split(','),
+          }]
+        },
+        options: {}
+      });
       const averageTemperatureCtx = document.getElementById('averageTemperatureChart').getContext('2d');
       const averageTemperatureChart = new Chart(averageTemperatureCtx, {
         type: line,
@@ -32,8 +54,8 @@ html
         },
         options: {}
       });
-      const highestTemperatureCtx = document.getElementById('highestTemperatureChart').getContext('2d');
-      const highestTemperatureChart = new Chart(highestTemperatureCtx, {
+      const lowestTemperatureCtx = document.getElementById('lowestTemperatureChart').getContext('2d');
+      const lowestTemperatureChart = new Chart(lowestTemperatureCtx, {
         type: line,
         data: {
           labels: "#{label}".split(','),
@@ -41,13 +63,13 @@ html
             label: baseLabel,
             backgroundColor: 'rgb(0, 0, 0)',
             borderColor: 'rgb(255, 0, 0)',
-            data: "#{baseHighestTemperatures}".split(','),
+            data: "#{baseLowestTemperatures}".split(','),
           },
           {
             label: targetLabel,
             backgroundColor: 'rgb(0, 0, 0)',
             borderColor: 'rgb(0, 0, 255)',
-            data: "#{targetHighestTemperatures}".split(','),
+            data: "#{targetLowestTemperatures}".split(','),
           }]
         },
         options: {}

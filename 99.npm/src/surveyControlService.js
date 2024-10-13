@@ -3,12 +3,12 @@ import { SurveyDataSource } from "./surveyDataSource.js";
 import { SurveyView } from "./surveyView.js";
 
 export class SurveyControlService {
-  constructor(obj) {
-    this.prefecture = obj.prefecture;
-    this.city = obj.city;
-    this.baseYear = obj.baseYear;
-    this.targetYear = obj.targetYear;
-    this.month = obj.month;
+  constructor(answer) {
+    this.prefecture = answer.prefecture;
+    this.city = answer.city;
+    this.baseYear = answer.baseYear;
+    this.targetYear = answer.targetYear;
+    this.month = answer.month;
   }
 
   async fetchData() {
@@ -25,43 +25,51 @@ export class SurveyControlService {
 
     const {
       label,
-      baseAverageTemperatures,
       baseHighestTemperatures,
-      targetAverageTemperatures,
+      baseAverageTemperatures,
+      baseLowestTemperatures,
       targetHighestTemperatures,
+      targetAverageTemperatures,
+      targetLowestTemperatures,
     } = await surveyDataSource.read();
 
     const surveyView = new SurveyView({
-      label,
-      baseAverageTemperatures,
-      baseHighestTemperatures,
-      targetAverageTemperatures,
-      targetHighestTemperatures,
       city: this.city,
       baseYear: this.baseYear,
       targetYear: this.targetYear,
       month: this.month,
+      label,
+      baseHighestTemperatures,
+      baseAverageTemperatures,
+      baseLowestTemperatures,
+      targetHighestTemperatures,
+      targetAverageTemperatures,
+      targetLowestTemperatures,
     });
 
-    // const template = surveyView.createTemplate();
-    // return template;
     const {
-      averageOfBaseAverageTemperatures,
-      averageOfTargetAverageTemperatures,
       averageOfBaseHighestTemperatures,
+      averageOfBaseAverageTemperatures,
+      averageOfBaseLowestTemperatures,
       averageOfTargetHighestTemperatures,
+      averageOfTargetAverageTemperatures,
+      averageOfTargetLowestTemperatures,
     } = surveyView.createTemplate();
 
     return {
       label,
-      baseAverageTemperatures,
       baseHighestTemperatures,
-      targetAverageTemperatures,
+      baseAverageTemperatures,
+      baseLowestTemperatures,
       targetHighestTemperatures,
-      averageOfBaseAverageTemperatures,
-      averageOfTargetAverageTemperatures,
+      targetAverageTemperatures,
+      targetLowestTemperatures,
       averageOfBaseHighestTemperatures,
+      averageOfBaseAverageTemperatures,
+      averageOfBaseLowestTemperatures,
       averageOfTargetHighestTemperatures,
+      averageOfTargetAverageTemperatures,
+      averageOfTargetLowestTemperatures,
     };
   }
 }
