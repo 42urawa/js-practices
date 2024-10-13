@@ -3,6 +3,12 @@
   "version": "1.0.3",
   "description": "README",
   "main": "main.js",
+  "bin": {
+    "global-warming-checker1013": "./src/main.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "fix": "prettier --write . && eslint --fix .",
     "lint": "prettier --check . && eslint ."

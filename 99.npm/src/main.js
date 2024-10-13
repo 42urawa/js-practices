@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+
+import { fileURLToPath } from "url";
+import path from "path";
 import express from "express";
 import open from "open";
 import { SurveyCLI } from "./surveyCLI.js";
@@ -7,7 +11,6 @@ const endTime = 5000;
 const main = async () => {
   const surveyCLI = new SurveyCLI();
 
-  // const template = await surveyCLI.execute();
   const {
     city,
     label,
@@ -24,19 +27,6 @@ const main = async () => {
     month,
   } = await surveyCLI.execute();
 
-  console.log(
-    "label",
-    label,
-    "base-ave",
-    baseAverageTemperatures,
-    "target-ave",
-    targetAverageTemperatures,
-    "base-hith",
-    targetAverageTemperatures,
-    "target-high",
-    targetHighestTemperatures,
-  );
-
   const app = express();
   const port = 3000;
 
@@ -44,6 +34,12 @@ const main = async () => {
   app.use(express.urlencoded({ extended: true }));
 
   app.set("view engine", "pug");
+
+  const filePath = fileURLToPath(import.meta.url);
+  const fileDir = path.dirname(filePath);
+  const templateFilePath = path.join(fileDir, "/views");
+
+  app.set("views", templateFilePath);
 
   app.get("/", (_, res) => {
     res.render("index", {
@@ -62,10 +58,6 @@ const main = async () => {
       month,
     });
   });
-
-  // app.get("/", (_, res) => {
-  //   res.send(template);
-  // });
 
   const server = app.listen(port, () => {
     console.log(`Server is runnnin on port ${port}`);
