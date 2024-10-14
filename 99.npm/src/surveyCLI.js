@@ -59,40 +59,7 @@ export class SurveyCLI {
       month,
     });
 
-    const {
-      label,
-      baseHighestTemperatures,
-      baseAverageTemperatures,
-      baseLowestTemperatures,
-      targetHighestTemperatures,
-      targetAverageTemperatures,
-      targetLowestTemperatures,
-      averageOfBaseHighestTemperatures,
-      averageOfBaseAverageTemperatures,
-      averageOfBaseLowestTemperatures,
-      averageOfTargetHighestTemperatures,
-      averageOfTargetAverageTemperatures,
-      averageOfTargetLowestTemperatures,
-    } = await surveyControlService.fetchData();
-
-    return {
-      city,
-      baseYear,
-      targetYear,
-      month,
-      label,
-      baseHighestTemperatures,
-      baseAverageTemperatures,
-      baseLowestTemperatures,
-      targetHighestTemperatures,
-      targetAverageTemperatures,
-      targetLowestTemperatures,
-      averageOfBaseHighestTemperatures,
-      averageOfBaseAverageTemperatures,
-      averageOfBaseLowestTemperatures,
-      averageOfTargetHighestTemperatures,
-      averageOfTargetAverageTemperatures,
-      averageOfTargetLowestTemperatures,
-    };
+    const template = await surveyControlService.fetchData();
+    return template;
   }
 }

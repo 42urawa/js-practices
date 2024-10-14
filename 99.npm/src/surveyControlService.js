@@ -47,29 +47,7 @@ export class SurveyControlService {
       targetLowestTemperatures,
     });
 
-    const {
-      averageOfBaseHighestTemperatures,
-      averageOfBaseAverageTemperatures,
-      averageOfBaseLowestTemperatures,
-      averageOfTargetHighestTemperatures,
-      averageOfTargetAverageTemperatures,
-      averageOfTargetLowestTemperatures,
-    } = surveyView.createTemplate();
-
-    return {
-      label,
-      baseHighestTemperatures,
-      baseAverageTemperatures,
-      baseLowestTemperatures,
-      targetHighestTemperatures,
-      targetAverageTemperatures,
-      targetLowestTemperatures,
-      averageOfBaseHighestTemperatures,
-      averageOfBaseAverageTemperatures,
-      averageOfBaseLowestTemperatures,
-      averageOfTargetHighestTemperatures,
-      averageOfTargetAverageTemperatures,
-      averageOfTargetLowestTemperatures,
-    };
+    const template = surveyView.createTemplate();
+    return template;
   }
 }
