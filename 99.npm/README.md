@@ -1,6 +1,6 @@
-# global-warming-ckecker
+# globalwarmingsurvey
 
-`global-warming-checker` is a CLI tool that allows users to select a location, base year, comparison year, and month through a series of questions and displays temperature data as a line graph. This tool scrapes data from the Japan Meteorological Agency and visualizes the data for comparison.
+`globalwarmingsurvey` is a CLI tool that allows users to select a location, base year, comparison year, and month through a series of questions and displays temperature data as a line graph. This tool scrapes data from the Japan Meteorological Agency and visualizes the data for comparison.
 
 ## Features
 
@@ -12,49 +12,27 @@
 
 - **Server Activation**: Starts a local server using the Express library, allowing users to view the results in their browser.
 
-## Installation
-
-Run the following command in any directory.
-
-```bash
-npm init -y
-```
-
-```bash
-npm install global-warming-checker
-```
-
 ## Usage
 
-1. Run the program:
+### 1. Run the program:
 
 ```bash
-node node_modules/global-warming-checker/src/main.js
+npx globalwarmingsurvey
 ```
 
-Alternatively, you can add the following to `package.json` to make it executable with `npm start`.
-
-```json
-{
-  "scripts": {
-    "start": "node node_modules/global-warming-checker/src/main.js"
-  }
-}
-```
-
-2. Answer the questions prompted by the Enquirer library.
+### 2. Answer the questions prompted by the Enquirer library.
 
 <img width="937" alt="image" src="https://github.com/kitarou888/js-practices/assets/85793702/43d063ce-5fe5-4915-9663-23d3d337fe0d">
 
 <img width="934" alt="image" src="https://github.com/kitarou888/js-practices/assets/85793702/c907bfc1-f774-4b5e-abbc-b72e75dba574">
 
-3. After all questions are answered:
+### 3. After all questions are answered:
 
 - The program will scrape the Japan Meteorological Agency's website for the specified location, year, and month to obtain the average and maximum temperatures.
 
-4. The program will create an HTML element with a line graph displaying the data using the Chart.js library.
+### 4. The program will create an HTML element with a line graph displaying the data using the Chart.js library.
 
-5. Start the local server using the Express library:
+### 5. Start the local server using the Express library:
 
 ## Required Libraries
 
@@ -62,6 +40,7 @@ Alternatively, you can add the following to `package.json` to make it executable
 - Puppeteer
 - Express
 - Open
+- Pug
 
 ## Contributing
 

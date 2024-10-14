@@ -1,10 +1,10 @@
 {
-  "name": "global-warming-checker",
-  "version": "1.0.3",
+  "name": "globalwarmingsurvey",
+  "version": "1.0.1",
   "description": "README",
   "main": "main.js",
   "bin": {
-    "global-warming-checker1013": "./src/main.js"
+    "globalwarmingsurvey": "./src/main.js"
   },
   "engines": {
     "node": ">=18"
